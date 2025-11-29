@@ -1,0 +1,1314 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Planta | Voxem 3D</title>
+  
+  <!-- Fuente Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Iconos Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    
+    :root {
+      --primary: #00b4d8;
+      --primary-dark: #0077b6;
+      --secondary: #90e0ef;
+      --accent: #caf0f8;
+      --text: #333;
+      --bg: #f4faff;
+      --card-bg: #ffffff;
+      --shadow: 0 10px 30px -10px rgba(0, 180, 216, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: 'Poppins', sans-serif; 
+      background-color: var(--bg);
+      background-image: radial-gradient(#dcf2ff 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--text); 
+      margin: 0; 
+      padding: 0; 
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* 🌿 Encabezado Hero */ 
+    header { 
+      text-align: center; 
+      padding: 60px 20px 40px; 
+      background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+      border-bottom-left-radius: 40px;
+      border-bottom-right-radius: 40px;
+      box-shadow: var(--shadow);
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0,180,216,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .logo { 
+      /* CAMBIO REALIZADO AQUÍ: Aumentado el tamaño máximo del logo */
+      width: auto; 
+      max-width: 200px; /* Tamaño máximo ajustado */
+      height: 70px; /* Altura ajustada para ser un poco más grande */
+      margin-bottom: 15px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      object-fit: contain; 
+    }
+
+    h1 { 
+      margin: 10px 0; 
+      font-size: 2.2em; 
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    header p {
+      color: #666;
+      font-size: 1.1em;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* 👤 Selector de Perfiles (Nuevo) */
+    #profile-selector-bar {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px 15px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px);
+    }
+
+    #current-profile-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--primary-dark);
+      transition: color 0.2s;
+    }
+
+    #current-profile-info:hover {
+      color: var(--primary);
+    }
+
+    #profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+
+    #profile-name {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Botones de acción (Añadir/Eliminar/Editar) */
+    .action-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.1s;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+    .action-btn:active {
+        transform: scale(0.98);
+    }
+
+    .action-btn.delete {
+        background: #ef4444; /* Rojo */
+    }
+    
+    .action-btn.edit {
+        background: #f59e0b; /* Amarillo/Naranja */
+    }
+
+    .action-btn:hover {
+        background: var(--primary-dark);
+    }
+
+    .action-btn.delete:hover {
+        background: #dc2626;
+    }
+
+    .action-btn.edit:hover {
+        background: #d97706;
+    }
+
+
+    /* 🌱 Cuerpo principal */ 
+    main { 
+      padding: 20px; 
+      max-width: 900px; 
+      margin: auto; 
+      display: grid;
+      gap: 30px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Estilos Generales de Tarjeta */
+    section { 
+      background: var(--card-bg); 
+      border-radius: 24px; 
+      padding: 30px; 
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* Estilos para el resto de secciones (Cuidados, Notas, Crecimiento...) */
+    .section-content-container {
+      transition: opacity 0.3s;
+      grid-column: 1 / -1; /* Ocupa todo el ancho en el grid */
+      display: contents; /* Permite que las secciones sean los hijos directos del grid */
+    }
+    .loading .section-content-container {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--primary-dark);
+      font-size: 1.5rem;
+      margin-top: 0;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* Galería y Notas a 1 columna en desktop */
+    .crecimiento { grid-column: 1 / -1; }
+    .notas { grid-column: 1 / -1; }
+
+    /* Controles y Calendario a 2 columnas en desktop */
+    .cuidados { grid-column: 1 / 2; }
+    .calendario { grid-column: 2 / 3; }
+
+    /* Estilos de Notas */
+    .notas textarea {
+      width: 100%;
+      height: 200px;
+      padding: 15px;
+      border: 1px solid var(--secondary);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      resize: vertical;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .notas textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--accent);
+    }
+    
+    /* Estilos de Galería */
+    .upload-area {
+      text-align: center;
+      border: 2px dashed var(--secondary);
+      border-radius: 16px;
+      padding: 20px;
+      background: #fdfdfd;
+      transition: all 0.3s;
+    }
+    
+    label[for="fotoInput"] { 
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--primary); 
+      color: white; 
+      padding: 12px 24px; 
+      border-radius: 50px; 
+      cursor: pointer; 
+      transition: transform 0.2s, background 0.3s; 
+      font-weight: 600; 
+      box-shadow: 0 4px 15px rgba(0, 180, 216, 0.4);
+    }
+    label[for="fotoInput"]:hover { background-color: var(--primary-dark); transform: scale(1.05); }
+
+    #galeria {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    #galeria .img-container { 
+      position: relative; 
+      width: 100%; 
+      aspect-ratio: 1; 
+      border-radius: 16px; 
+      overflow: hidden; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
+    }
+    #galeria .img-container img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      transition: transform 0.5s; 
+    }
+    #galeria .img-container:hover img {
+        transform: scale(1.05);
+    }
+    #galeria .borrar-btn { 
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(255, 0, 0, 0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 10;
+    }
+    #galeria .img-container:hover .borrar-btn {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    /* Estilos de Cuidados */
+    .cuidados ul { list-style: none; padding: 0; }
+    .cuidados li { 
+        background: var(--accent);
+        margin-bottom: 10px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: background 0.3s;
+        cursor: pointer;
+    }
+    .cuidados li:hover {
+        background: #b3e5fc;
+    }
+    .cuidados li.checked {
+        background: #d4edda;
+        color: #155724;
+    }
+    .cuidados input[type="checkbox"] { 
+        margin-right: 15px; 
+        width: 20px;
+        height: 20px;
+        accent-color: var(--primary);
+    }
+
+
+    /* 💧 Calendario de riego */ 
+    .calendario-header { text-align: center; margin-bottom: 20px; }
+    .calendario-titulo { font-weight: 700; font-size: 1.3rem; text-transform: capitalize; color: var(--primary-dark); background: var(--accent); display: inline-block; padding: 5px 20px; border-radius: 20px; }
+    .dias-semana { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 10px; }
+    .cab-dia { text-align: center; font-weight: 600; font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+    .mes-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .dia-cell { aspect-ratio: 1; background: #fdfdfd; border: 1px solid #f0f0f0; border-radius: 12px; padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; transition: all 0.2s; cursor: pointer; }
+    .dia-cell:hover { background: #f0faff; border-color: var(--secondary); }
+    .dia-cell.empty { background: transparent; border: none; cursor: default; }
+    .day-number { font-size: 0.8rem; color: #aaa; font-weight: 600; }
+    .water-drop-svg { width: 24px; height: 24px; fill: #e0e0e0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .dia-cell:hover .water-drop-svg { transform: scale(1.2); fill: #b3e5fc; }
+    .water-drop-svg.active { fill: #00bfff; filter: drop-shadow(0 0 5px rgba(0, 191, 255, 0.5)); transform: scale(1.1); }
+
+    /* ⚙️ Footer */ 
+    footer { 
+      text-align: center; 
+      padding: 40px 20px; 
+      font-size: 0.9em; 
+      background: #fff; 
+      color: #666;
+      margin-top: 40px;
+      border-top: 1px solid #eee;
+    }
+
+    .redes {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .redes a { 
+      color: var(--primary); 
+      text-decoration: none; 
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.3s;
+    }
+
+    .redes a:hover { 
+      color: var(--primary-dark); 
+    }
+
+    /* 🖼️ Modal */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        max-width: 90%;
+        width: 450px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        position: relative;
+    }
+
+    .modal-content h3 {
+        color: var(--primary-dark);
+        margin-top: 0;
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-size: 1.6rem;
+    }
+
+    .modal label {
+        font-weight: 600; 
+        display: block; 
+        margin-bottom: 5px;
+        color: #444;
+    }
+
+    .modal input[type="text"], .modal select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .modal-actions .action-btn {
+        width: auto;
+    }
+
+    .modal-actions .cancel-btn {
+        background: #9ca3af;
+    }
+    .modal-actions .cancel-btn:hover {
+        background: #6b7280;
+    }
+
+    /* Contenedores de vista del modal */
+    .modal-view {
+        display: none;
+    }
+    .modal-view.active {
+        display: block;
+    }
+    
+    .profile-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px 15px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border: 1px solid #eee;
+    }
+    .profile-item:hover {
+        background-color: var(--accent);
+    }
+    .profile-item.active {
+        background-color: var(--secondary);
+        border-color: var(--primary);
+        font-weight: 600;
+    }
+    .profile-item-img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary);
+    }
+    .profile-item-name {
+        flex-grow: 1;
+    }
+
+
+
+    /* Responsive */
+@media (max-width: 768px) {
+
+    /* Ajusta el header para no verse gigantesco */
+    header {
+        padding: 30px 15px;
+        margin-bottom: 20px;
+        border-bottom-left-radius: 25px;
+        border-bottom-right-radius: 25px;
+    }
+
+    /* Logo más pequeño y adaptable */
+    .logo {
+        max-width: 150px;
+        height: auto;
+    }
+
+    /* Título más pequeño */
+    h1 {
+        font-size: 1.6em;
+    }
+
+    header p {
+        font-size: 0.95em;
+    }
+
+    /* El grid del main se vuelve 1 columna */
+    main {
+        grid-template-columns: 1fr;
+        padding: 15px;
+        gap: 20px;
+    }
+
+    .cuidados,
+    .calendario,
+    .crecimiento,
+    .notas {
+        grid-column: 1 / -1 !important;
+    }
+
+    /* Barra de perfiles movida arriba sin solaparse */
+    #profile-selector-bar {
+        position: static;
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        justify-content: space-between;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    #current-profile-info {
+        font-size: 0.9em;
+    }
+
+    #profile-name {
+        max-width: 90px;
+    }
+
+    #profile-pic {
+        width: 32px;
+        height: 32px;
+    }
+
+    /* Tarjetas más compactas */
+    section {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    /* Notas */
+    .notas textarea {
+        height: 150px;
+        font-size: 0.9rem;
+    }
+
+    /* Galería ajustada para móvil */
+    #galeria {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px;
+    }
+
+    /* Calendario más compacto */
+    .calendario-titulo {
+        font-size: 1.1rem;
+        padding: 5px 15px;
+    }
+
+    .dias-semana .cab-dia {
+        font-size: 0.7rem;
+    }
+
+    .mes-grid {
+        gap: 6px;
+    }
+
+    .dia-cell {
+        aspect-ratio: 1;
+        padding: 3px;
+    }
+
+    .day-number {
+        font-size: 0.7rem;
+    }
+
+    .water-drop-svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Modal adaptado */
+    .modal-content {
+        width: 90%;
+        padding: 20px;
+        max-width: 350px;
+    }
+
+    .modal-content h3 {
+        font-size: 1.3rem;
+    }
+}
+
+  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+
+    <title>Tu App de Macetas</title>
+    <link rel="stylesheet" href="styles.css"> 
+    </head>
+</head>
+<body class="loading">
+
+  <header>
+    <!-- Contenedor del selector de perfiles en la esquina superior izquierda -->
+    <div id="profile-selector-bar">
+      <div id="current-profile-info" title="Cambiar/Gestionar Perfil">
+        <img id="profile-pic" src="https://placehold.co/40x40/90e0ef/0077b6?text=P" alt="Foto de perfil">
+        <span id="profile-name">Cargando...</span>
+        <i data-lucide="chevron-down" size="16"></i>
+      </div>
+      
+      <div id="profile-actions" style="display: flex; gap: 10px;">
+        <button id="add-profile-btn" class="action-btn" title="Añadir nueva planta"><i data-lucide="leaf" size="16"></i> Añadir</button>
+        <button id="edit-profile-btn" class="action-btn edit" style="display:none;" title="Editar nombre y foto"><i data-lucide="pencil" size="16"></i> Editar</button>
+        <button id="delete-profile-btn" class="action-btn delete" style="display:none;" title="Eliminar planta y su data"><i data-lucide="trash-2" size="16"></i></button>
+      </div>
+    </div>
+
+    <!-- Logo: Ahora más grande gracias al ajuste en el CSS (max-width: 200px, height: 70px) -->
+    <img src="imagen.png" onerror="this.onerror=null; this.src='https://placehold.co/200x70/e0f7fa/0077b6?text=VOXEM+3D'" alt="Logo de la Planta Voxem 3D" class="logo">
+    
+    <h1>Control de Planta Voxem 3D</h1> 
+    
+    <p>Organiza el riego, las notas y el crecimiento de tus plantas con estilo.</p>
+  </header>
+
+  <main>
+    <div class="section-content-container">
+        <!-- 📸 Sección de Crecimiento -->
+        <section class="crecimiento">
+          <h2><i data-lucide="camera"></i> Crecimiento</h2>
+          <p class="section-description">Sube una foto de tu planta cada mes para ver su progreso.</p>
+          
+          <div class="upload-area">
+            <label for="fotoInput" class="boton-archivo">
+              <i data-lucide="upload-cloud"></i> Seleccionar foto
+            </label>
+            <input type="file" id="fotoInput" accept="image/*" style="display: none;">
+            <div id="galeria"></div>
+          </div>
+        </section>
+
+        <!-- 🌿 Sección de Cuidados -->
+        <section class="cuidados">
+          <h2><i data-lucide="heart-handshake"></i> Cuidados y recordatorios</h2>
+          <ul id="listaCuidados">
+            <!-- La clase 'checked' se añade por JS -->
+            <li><input type="checkbox" id="check1"> Asegúrate de que la tierra esté bien</li>
+            <li><input type="checkbox" id="check2"> Revisa que reciba suficiente luz solar</li>
+            <li><input type="checkbox" id="check3"> Controla la humedad del ambiente</li>
+            <li><input type="checkbox" id="check4"> Limpia las hojas del polvo</li>
+          </ul>
+        </section>
+
+        <!-- 💧 Calendario de Riego -->
+        <section class="calendario">
+          <h2><i data-lucide="droplet"></i> Calendario de Riego</h2>
+          <div id="calendario-container"></div>
+        </section>
+
+        <!-- 📝 Sección de Notas -->
+        <section class="notas">
+          <h2><i data-lucide="notebook-pen"></i> Diario de la Planta</h2>
+          <textarea id="nota" placeholder="¿Cómo está tu planta hoy? Escribe aquí..."></textarea>
+        </section>
+
+        
+    </div>
+  </main>
+
+ <footer>
+    <p>Hecho con impresión 3D por <strong>Voxem 3D</strong> 🌱</p>
+    <div class="redes">
+        <!-- Instagram (Link correcto) -->
+        <a href="https://www.instagram.com/voxem3d" target="_blank"><i data-lucide="instagram" size="16"></i> Instagram</a>
+        
+        <!-- Facebook (Link correcto) -->
+        <a href="https://www.facebook.com/share/17xJatGe9U/?mibextid=wwXIfr" target="_blank"><i data-lucide="facebook" size="16"></i> Facebook</a>
+        
+        <!-- WhatsApp (Link correcto con número de Guatemala) -->
+        <a href="https://wa.me/50237823458" target="_blank"><i data-lucide="message-circle" size="16"></i> WhatsApp</a>
+
+          <!-- TikTok: CORREGIDO usando un SVG inline que sí representa el logo de TikTok. -->
+                <a href="https://www.tiktok.com/@voxem.3d" target="_blank" class="text-cyan-500 hover:text-cyan-600 transition duration-150 flex items-center space-x-1">
+                    <!-- SVG del logo de TikTok (nota musical) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-music-2">
+                        <path d="M9 18V5l12-2v13"/>
+                        <circle cx="6" cy="18" r="3"/>
+                        <circle cx="18" cy="16" r="3"/>
+                    </svg>
+                    <span>TikTok</span>
+                </a>
+    </div>
+</footer>
+
+  <!-- MODAL DE PERFILES -->
+  <div id="profile-modal" class="modal">
+    <div class="modal-content">
+      
+      <!-- VISTA 1: CAMBIAR PERFIL -->
+      <div id="view-switch" class="modal-view active">
+        <h3>Cambiar Planta Activa</h3>
+        <p>Selecciona la maceta que deseas monitorear:</p>
+        <div id="profile-list-container" style="max-height: 250px; overflow-y: auto; padding-right: 10px;">
+          <!-- Items de perfil se inyectan aquí -->
+        </div>
+        <div class="modal-actions">
+          <button id="close-switch-modal-btn" class="action-btn cancel-btn">Cerrar</button>
+        </div>
+      </div>
+      
+      <!-- VISTA 2: CREAR NUEVO PERFIL -->
+      <div id="view-create" class="modal-view">
+        <h3>Crear Nueva Planta</h3>
+        
+        <label for="new-profile-name">Nombre de la planta:</label>
+        <input type="text" id="new-profile-name" placeholder="Ej: Ficus de Ana, Maceta #1">
+        
+        <label for="new-profile-photo-label">Foto de la planta (opcional):</label>
+        <label id="new-profile-photo-label" for="new-profile-photo" style="display: block;">
+          <span class="action-btn" style="background: #10b981; margin-bottom: 15px; width: 100%; justify-content: center;"><i data-lucide="image" size="16"></i> Subir Foto</span>
+        </label>
+        <input type="file" id="new-profile-photo" accept="image/*" style="display:none;">
+
+        <div class="modal-actions">
+          <button id="back-to-switch-btn" class="action-btn cancel-btn">Cancelar</button>
+          <button id="create-profile-modal-btn" class="action-btn" style="background: var(--primary);">Crear y Seleccionar</button>
+        </div>
+      </div>
+      
+      <!-- VISTA 3: EDITAR PERFIL ACTUAL -->
+      <div id="view-edit" class="modal-view">
+        <h3>Editar Planta (<span id="editing-profile-name"></span>)</h3>
+        
+        <label for="edit-profile-name">Nuevo Nombre:</label>
+        <input type="text" id="edit-profile-name" placeholder="Nuevo nombre de la planta">
+        
+        <label for="edit-profile-photo-label">Cambiar Foto (opcional):</label>
+        <label id="edit-profile-photo-label" for="edit-profile-photo" style="display: block;">
+          <span class="action-btn" style="background: #10b981; margin-bottom: 15px; width: 100%; justify-content: center;"><i data-lucide="image" size="16"></i> Cambiar Foto</span>
+        </label>
+        <input type="file" id="edit-profile-photo" accept="image/*" style="display:none;">
+
+        <div class="modal-actions">
+          <button id="back-to-switch-from-edit-btn" class="action-btn cancel-btn">Cancelar</button>
+          <button id="save-edit-profile-modal-btn" class="action-btn edit">Guardar Cambios</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- Inicialización de iconos y Lógica de JavaScript -->
+  <script>
+    // Inicializa iconos de Lucide
+    lucide.createIcons();
+
+    // Variable global para almacenar el ID del perfil activo
+    let currentProfileId = null;
+    let profilesList = [];
+
+    // --- FUNCIONES DE ALMACENAMIENTO (LOCALSTORAGE) ---
+
+    // Obtener la clave de almacenamiento específica para el perfil activo
+    const getKey = (key) => `plantData_${currentProfileId}_${key}`;
+
+    // Obtener todos los perfiles de la lista maestra
+    const loadProfilesList = () => {
+        try {
+            const list = JSON.parse(localStorage.getItem('profilesList')) || [];
+            profilesList = list;
+            return profilesList;
+        } catch (e) {
+            console.error("Error al cargar la lista de perfiles:", e);
+            return [];
+        }
+    };
+
+    // Guardar la lista maestra de perfiles
+    const saveProfilesList = () => {
+        localStorage.setItem('profilesList', JSON.stringify(profilesList));
+    };
+
+    // Cargar toda la data del perfil activo
+    const loadData = () => {
+        if (!currentProfileId) return {};
+        
+        return {
+            nota: localStorage.getItem(getKey('nota')) || "",
+            gotasActivas: JSON.parse(localStorage.getItem(getKey('gotasActivas'))) || {},
+            misFotos: JSON.parse(localStorage.getItem(getKey('misFotos'))) || [],
+            checks: JSON.parse(localStorage.getItem(getKey('checks'))) || {},
+        };
+    };
+
+    // Guardar toda la data del perfil activo
+    // (Esta función es principalmente de respaldo, los listeners guardan directamente)
+    const saveData = (data) => {
+        if (!currentProfileId) return;
+
+        localStorage.setItem(getKey('nota'), data.nota);
+        localStorage.setItem(getKey('gotasActivas'), JSON.stringify(data.gotasActivas));
+        localStorage.setItem(getKey('misFotos'), JSON.stringify(data.misFotos));
+        localStorage.setItem(getKey('checks'), JSON.stringify(data.checks));
+    };
+
+    // --- FUNCIONES DE UTILIDAD UI ---
+
+    // Reemplazar window.confirm/alert
+    function mostrarConfirmacion(mensaje, callbackSi) {
+        // NOTA: Usar window.confirm para este entorno simulado ya que no se puede crear un modal de alerta/confirmación personalizado sin más archivos.
+        if (window.confirm(mensaje)) {
+            callbackSi();
+        } 
+    }
+    
+    // Función para mostrar la vista del modal
+    const showModalView = (viewId) => {
+        document.querySelectorAll('.modal-view').forEach(view => {
+            view.classList.remove('active');
+        });
+        document.getElementById(viewId).classList.add('active');
+        document.getElementById('profile-modal').style.display = 'flex';
+    }
+
+
+    // --- LÓGICA DE PERFILES ---
+
+    // Crea un nuevo perfil o actualiza uno existente
+    const createNewProfile = (name, photoBase64) => {
+        const newId = crypto.randomUUID();
+        const newProfile = { 
+            id: newId, 
+            name: name, 
+            photo: photoBase64 || 'https://placehold.co/40x40/90e0ef/0077b6?text=P' 
+        };
+        
+        profilesList.push(newProfile);
+        saveProfilesList();
+
+        // Inicializar data vacía para el nuevo perfil
+        currentProfileId = newId;
+        saveData({ nota: '', gotasActivas: {}, misFotos: [], checks: {} });
+        
+        selectProfile(newId);
+    };
+
+    // Actualiza el nombre y/o foto del perfil activo
+    const updateActiveProfile = (newName, newPhotoBase64) => {
+        const profileIndex = profilesList.findIndex(p => p.id === currentProfileId);
+        if (profileIndex === -1) return;
+
+        const profile = profilesList[profileIndex];
+        
+        // Actualizar nombre si es diferente y no está vacío
+        if (newName && newName !== profile.name) {
+            profile.name = newName;
+        }
+
+        // Actualizar foto si se proporcionó una nueva
+        if (newPhotoBase64) {
+            profile.photo = newPhotoBase64;
+        }
+
+        saveProfilesList();
+        selectProfile(currentProfileId); // Recargar
+    };
+
+    // Renderiza la lista de perfiles dentro del modal
+    const renderProfileList = () => {
+        const container = document.getElementById('profile-list-container');
+        container.innerHTML = '';
+        profilesList.forEach(p => {
+            const item = document.createElement('div');
+            item.className = `profile-item ${p.id === currentProfileId ? 'active' : ''}`;
+            item.innerHTML = `
+                <img class="profile-item-img" src="${p.photo}" alt="Foto de ${p.name}">
+                <span class="profile-item-name">${p.name}</span>
+            `;
+            item.addEventListener('click', () => {
+                selectProfile(p.id);
+                document.getElementById('profile-modal').style.display = 'none';
+            });
+            container.appendChild(item);
+        });
+    };
+
+    // Selecciona el perfil y recarga la UI
+    const selectProfile = (id) => {
+        const profile = profilesList.find(p => p.id === id);
+        if (!profile) return;
+
+        currentProfileId = id;
+        localStorage.setItem('currentProfileId', id);
+        document.body.classList.add('loading');
+        
+        // 3. Actualizar la UI de la barra superior
+        document.getElementById('profile-name').textContent = profile.name;
+        document.getElementById('profile-pic').src = profile.photo;
+        
+        // Mostrar/Ocultar botones de acción
+        const isSingleProfile = profilesList.length <= 1;
+        document.getElementById('delete-profile-btn').style.display = isSingleProfile ? 'none' : 'flex';
+        document.getElementById('edit-profile-btn').style.display = 'flex'; // Siempre se puede editar el activo
+
+        // 4. Cargar y renderizar la nueva data
+        renderAllData();
+        
+        // Timeout para simular carga y evitar CLS
+        setTimeout(() => {
+            document.body.classList.remove('loading');
+        }, 300);
+    };
+
+    // Elimina el perfil activo y selecciona el siguiente o anterior
+    const deleteProfile = () => {
+        if (profilesList.length <= 1) {
+            return; // El botón debe estar oculto de todas formas
+        }
+
+        const profileName = profilesList.find(p => p.id === currentProfileId).name;
+
+        mostrarConfirmacion(`¿Estás seguro de eliminar el perfil '${profileName}' y toda su data?`, () => {
+            // Eliminar data de localStorage
+            localStorage.removeItem(getKey('nota'));
+            localStorage.removeItem(getKey('gotasActivas'));
+            localStorage.removeItem(getKey('misFotos'));
+            localStorage.removeItem(getKey('checks'));
+
+            // Eliminar de la lista de perfiles
+            const indexToDelete = profilesList.findIndex(p => p.id === currentProfileId);
+            profilesList.splice(indexToDelete, 1);
+            saveProfilesList();
+
+            // Seleccionar el nuevo perfil (el primero de la lista)
+            selectProfile(profilesList[0].id);
+        });
+    };
+
+    // --- RENDERIZACIÓN DE DATOS ---
+
+    const renderCalendar = (data) => {
+        const contenedor = document.getElementById("calendario-container");
+        contenedor.innerHTML = '';
+        
+        const hoy = new Date();
+        const mes = hoy.toLocaleString('es-ES', { month: 'long' }); 
+        const año = hoy.getFullYear();
+        const primerDia = new Date(año, hoy.getMonth(), 1);
+        const ultimoDia = new Date(año, hoy.getMonth() + 1, 0);
+        const diasMes = ultimoDia.getDate();
+        const inicioSemana = primerDia.getDay() === 0 ? 6 : primerDia.getDay() - 1; 
+
+        // 🔹 Título del mes
+        const headerDiv = document.createElement("div");
+        headerDiv.className = "calendario-header";
+        const titulo = document.createElement("div");
+        titulo.className = "calendario-titulo";
+        titulo.textContent = `${mes} ${año}`;
+        headerDiv.appendChild(titulo);
+        contenedor.appendChild(headerDiv);
+
+        // 🔹 Cabecera de días de la semana
+        const diasSemana = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+        const cabecera = document.createElement("div");
+        cabecera.className = "dias-semana";
+        diasSemana.forEach(d => {
+            const celda = document.createElement("div");
+            celda.className = "cab-dia";
+            celda.textContent = d;
+            cabecera.appendChild(celda);
+        });
+        contenedor.appendChild(cabecera);
+
+        // 🔹 Cuadrícula del mes
+        const grid = document.createElement("div");
+        grid.className = "mes-grid";
+
+        for (let i = 0; i < inicioSemana; i++) {
+            grid.appendChild(document.createElement("div")).className = "dia-cell empty";
+        }
+
+        const gotasActivas = data.gotasActivas || {};
+
+        for (let dia = 1; dia <= diasMes; dia++) {
+            const celda = document.createElement("div");
+            celda.className = "dia-cell";
+
+            const numero = document.createElement("div");
+            numero.className = "day-number";
+            numero.textContent = dia;
+
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("viewBox", "0 0 24 24");
+            svg.setAttribute("class", "water-drop-svg");
+            const path = document.createElementNS(svgNS, "path");
+            path.setAttribute("d", "M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z");
+            svg.appendChild(path);
+
+            // Cargar estado inicial
+            if (gotasActivas[dia]) {
+                svg.classList.add("active");
+            }
+
+            // Listener para actualizar el estado y guardar
+            celda.addEventListener("click", () => {
+                svg.classList.toggle("active");
+                gotasActivas[dia] = svg.classList.contains("active");
+                // Guardar solo la sección de gotas
+                localStorage.setItem(getKey('gotasActivas'), JSON.stringify(gotasActivas));
+            });
+
+            celda.appendChild(numero);
+            celda.appendChild(svg);
+            grid.appendChild(celda);
+        }
+
+        contenedor.appendChild(grid);
+    };
+
+    const renderGallery = (data) => {
+        const galeria = document.getElementById("galeria");
+        galeria.innerHTML = "";
+        const fotosGuardadas = data.misFotos || [];
+
+        fotosGuardadas.forEach((src, index) => {
+            const cont = document.createElement("div");
+            cont.className = "img-container";
+
+            const img = document.createElement("img");
+            img.src = src;
+
+            const btnBorrar = document.createElement("button");
+            btnBorrar.className = "borrar-btn";
+            btnBorrar.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`;
+            
+            btnBorrar.addEventListener("click", (e) => {
+                e.stopPropagation(); 
+                mostrarConfirmacion('¿Borrar esta foto?', () => {
+                    fotosGuardadas.splice(index, 1);
+                    localStorage.setItem(getKey('misFotos'), JSON.stringify(fotosGuardadas));
+                    renderGallery({ misFotos: fotosGuardadas }); // Rerender
+                });
+            });
+
+            cont.appendChild(img);
+            cont.appendChild(btnBorrar);
+            galeria.appendChild(cont);
+        });
+    };
+
+    const renderChecks = (data) => {
+        const checks = data.checks || {};
+        const listaCuidados = document.getElementById('listaCuidados');
+        const listItems = listaCuidados.querySelectorAll('li');
+
+        listItems.forEach((li, index) => {
+            const checkbox = li.querySelector('input[type="checkbox"]');
+            const checkId = `check${index + 1}`;
+            
+            // Cargar estado
+            if (checkbox) {
+                checkbox.checked = !!checks[checkId];
+                li.classList.toggle('checked', checkbox.checked);
+            }
+
+            // Listener para guardar y actualizar clase
+            li.onclick = (e) => {
+                // Solo si no es el checkbox directamente
+                if (e.target.tagName !== 'INPUT') {
+                    checkbox.checked = !checkbox.checked;
+                }
+
+                checks[checkId] = checkbox.checked;
+                li.classList.toggle('checked', checkbox.checked);
+                localStorage.setItem(getKey('checks'), JSON.stringify(checks));
+            };
+            // Asegurar que el cambio en el input también funciona
+            checkbox.onchange = (e) => {
+                checks[checkId] = e.target.checked;
+                li.classList.toggle('checked', e.target.checked);
+                localStorage.setItem(getKey('checks'), JSON.stringify(checks));
+            };
+
+        });
+    };
+
+    const renderAllData = () => {
+        if (!currentProfileId) return;
+
+        const data = loadData();
+
+        // Notas
+        const notaTextarea = document.getElementById("nota");
+        notaTextarea.value = data.nota;
+        // Guardar cada vez que el usuario escribe
+        notaTextarea.oninput = () => {
+            localStorage.setItem(getKey('nota'), notaTextarea.value);
+        };
+
+        // Calendario
+        renderCalendar(data);
+        
+        // Galería
+        renderGallery(data);
+
+        // Checks
+        renderChecks(data);
+    };
+
+    // --- LÓGICA DE EVENTOS Y MODAL ---
+
+    const setupModalEvents = () => {
+        const modal = document.getElementById('profile-modal');
+        const modalViews = {
+            switch: document.getElementById('view-switch'),
+            create: document.getElementById('view-create'),
+            edit: document.getElementById('view-edit')
+        };
+        
+        // Botones de la barra superior
+        const currentProfileInfo = document.getElementById('current-profile-info');
+        const addBtn = document.getElementById('add-profile-btn');
+        const editBtn = document.getElementById('edit-profile-btn');
+        const deleteBtn = document.getElementById('delete-profile-btn');
+
+        // Botones del modal
+        const closeModalBtns = [document.getElementById('close-switch-modal-btn'), document.getElementById('back-to-switch-btn'), document.getElementById('back-to-switch-from-edit-btn')];
+        const createProfileModalBtn = document.getElementById('create-profile-modal-btn');
+        const saveEditProfileModalBtn = document.getElementById('save-edit-profile-modal-btn');
+        
+        // Campos de input
+        const newProfileNameInput = document.getElementById('new-profile-name');
+        const newProfilePhotoInput = document.getElementById('new-profile-photo');
+        const editProfileNameInput = document.getElementById('edit-profile-name');
+        const editProfilePhotoInput = document.getElementById('edit-profile-photo');
+        const editingProfileNameSpan = document.getElementById('editing-profile-name');
+
+        // --- Funciones del Modal ---
+        const openSwitchView = () => {
+            renderProfileList(); // Asegurar que la lista de selección esté actualizada
+            showModalView('view-switch');
+        };
+        
+        const openCreateView = () => {
+            newProfileNameInput.value = '';
+            newProfilePhotoInput.value = null;
+            showModalView('view-create');
+        };
+
+        const openEditView = () => {
+            const profile = profilesList.find(p => p.id === currentProfileId);
+            if (!profile) return;
+            
+            editingProfileNameSpan.textContent = profile.name;
+            editProfileNameInput.value = profile.name; // Cargar nombre actual
+            editProfilePhotoInput.value = null; // Limpiar input de archivo
+            showModalView('view-edit');
+        };
+        
+        const closeModals = () => {
+            modal.style.display = 'none';
+        }
+
+        // --- Listeners de la Barra Superior ---
+        currentProfileInfo.addEventListener('click', openSwitchView); // Abre para cambiar
+        addBtn.addEventListener('click', openCreateView); // Abre para crear
+        editBtn.addEventListener('click', openEditView); // Abre para editar el actual
+        deleteBtn.addEventListener('click', deleteProfile); // Eliminar perfil activo
+
+        // --- Listeners del Modal ---
+        closeModalBtns.forEach(btn => btn.addEventListener('click', closeModals));
+
+        // Crear Perfil
+        createProfileModalBtn.addEventListener('click', () => {
+            const name = newProfileNameInput.value.trim();
+            const file = newProfilePhotoInput.files[0];
+
+            if (!name) {
+                // Usar window.alert para este entorno simulado
+                window.alert("Por favor, introduce un nombre para la planta.");
+                return;
+            }
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    createNewProfile(name, event.target.result);
+                    closeModals();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                createNewProfile(name, null); // Crear sin foto
+                closeModals();
+            }
+        });
+
+        // Guardar Edición de Perfil
+        saveEditProfileModalBtn.addEventListener('click', () => {
+            const newName = editProfileNameInput.value.trim();
+            const file = editProfilePhotoInput.files[0];
+
+            if (!newName) {
+                // Usar window.alert para este entorno simulado
+                window.alert("El nombre de la planta no puede estar vacío.");
+                return;
+            }
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    updateActiveProfile(newName, event.target.result);
+                    closeModals();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                updateActiveProfile(newName, null); // Solo actualizar nombre si aplica
+                closeModals();
+            }
+        });
+    };
+
+    // --- LÓGICA DE INICIO ---
+
+    const init = () => {
+        // 1. Cargar la lista maestra de perfiles
+        loadProfilesList(); 
+        
+        // 2. Determinar el perfil activo
+        const storedProfileId = localStorage.getItem('currentProfileId');
+        
+        if (profilesList.length === 0) {
+            // No hay perfiles, crear uno por defecto
+            const defaultName = "Mi Primera Maceta";
+            console.log("No hay perfiles, creando uno por defecto:", defaultName);
+            // Usamos createNewProfile que también llama a selectProfile
+            createNewProfile(defaultName, null); 
+        } else if (storedProfileId && profilesList.some(p => p.id === storedProfileId)) {
+            // El perfil activo guardado existe
+            selectProfile(storedProfileId);
+        } else {
+            // Seleccionar el primer perfil de la lista
+            selectProfile(profilesList[0].id);
+        }
+        
+        // 3. Configurar listeners de eventos del modal (perfiles)
+        setupModalEvents();
+        
+        // 4. Configurar listener de subida de fotos para la galería del perfil activo
+        const inputFoto = document.getElementById("fotoInput");
+        inputFoto.addEventListener("change", (e) => {
+            const archivo = e.target.files[0];
+            if (!archivo || !currentProfileId) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                // Agregar la imagen como Base64 (Data URL) al perfil activo
+                const data = loadData();
+                data.misFotos.push(event.target.result);
+                localStorage.setItem(getKey('misFotos'), JSON.stringify(data.misFotos));
+                renderGallery(data);
+                e.target.value = null; // Limpiar el input para permitir subir la misma foto
+            };
+            reader.readAsDataURL(archivo);
+        });
+
+        // 5. Eliminar la clase de carga al finalizar
+        setTimeout(() => {
+            document.body.classList.remove('loading');
+        }, 100);
+    };
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    
+  </script>
+</body>
+</html>
