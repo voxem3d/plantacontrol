@@ -502,7 +502,20 @@
 
     /* Responsive */
 @media (max-width: 768px) {
-
+ .redes {
+        flex-wrap: wrap; 
+        justify-content: center;
+        /* Reducimos el espacio entre los enlaces */
+        gap: 10px 8px; /* Reducido de 15px 10px a 10px 8px */
+    }
+    
+    .redes a { 
+        /* Reducimos el tamaño de la fuente */
+        font-size: 0.85em; /* Ligeramente más pequeño que 0.9em */
+        /* Reducimos el espacio dentro del enlace si tiene padding o margen (aunque no lo definiste, es una buena práctica) */
+        gap: 3px; 
+    }
+  
     /* Ajusta el header para no verse gigantesco */
     header {
         padding: 30px 15px;
@@ -1311,4 +1324,5 @@
     
   </script>
 </body>
+
 </html>
